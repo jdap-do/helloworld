@@ -8,8 +8,11 @@ pipeline {
                 echo 'FASE CLONADO=================================================================================================================='
                 echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
+                echo 'whoami'            
                 bat 'whoami'
-                bat 'hostname'
+                echo 'hostname'
+                bat 'hostname'                
+                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -21,8 +24,11 @@ pipeline {
                 echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
                 echo 'No hay compilación necesaria ya que es python'
+                echo 'whoami'            
                 bat 'whoami'
-                bat 'hostname'
+                echo 'hostname'
+                bat 'hostname'                
+                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -34,8 +40,11 @@ pipeline {
                 echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
                 echo 'Ejecutando pruebas con pytest'
+                echo 'whoami'            
                 bat 'whoami'
-                bat 'hostname'
+                echo 'hostname'
+                bat 'hostname'                
+                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
                 bat '''
                     mkdir test-reports
