@@ -11,11 +11,24 @@ pipeline {
                 bat 'echo %WORKSPACE%' 
             }
         }
-        
         stage('Etapa Build') {
             steps {
                 echo 'NO HAY QUE COMPILAR NADA, ESTO ES PYTHON'
             }
-        }    
+        }
+
+         stage('Test') {
+            steps {
+                echo 'Ejecutando pruebas unitarias con pytest'
+                bat 'mkdir test-reports'
+                bat 'pytest test/unit --junitxml=test-reports/results.xml'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'test-reports/results.xml'
+        }
     }
 }
