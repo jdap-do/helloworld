@@ -6,9 +6,13 @@ pipeline {
             agent { label 'agent-clone' }
             steps {
                 echo 'FASE CLONADO=================================================================================================================='
+                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
+                echo 'whoami'
                 bat 'whoami'
+                echo 'hostname'
                 bat 'hostname'
+                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -17,10 +21,14 @@ pipeline {
             agent { label 'agent-build' }
             steps {
                 echo 'FASE BUILD=================================================================================================================='
+                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
-                echo 'No hay compilación necesaria ya que es Python'
+                echo 'No hay compilación necesaria ya que es python'
+                echo 'whoami'
                 bat 'whoami'
+                echo 'hostname'
                 bat 'hostname'
+                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -29,30 +37,19 @@ pipeline {
             agent { label 'agent-test' }
             steps {
                 echo 'FASE TEST=================================================================================================================='
+                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
-                echo 'Levantando microservicio Flask y mock WireMock'
-
-                // Lanzar Flask app
-                bat '''
-                    start /B cmd /c "set FLASK_APP=app/main.py && set FLASK_RUN_PORT=5000 && flask run"
-                '''
-
-                // Lanzar WireMock
-                bat '''
-                    start /B cmd /c "java -jar wiremock-standalone-2.35.0.jar --port 9090"
-                '''
-
-                echo 'Esperando que servicios arranquen...'
-                bat 'timeout /t 5'
-
                 echo 'Ejecutando pruebas con pytest'
+                echo 'whoami'
                 bat 'whoami'
+                echo 'hostname'
                 bat 'hostname'
+                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
                 bat '''
                     mkdir test-reports
                     set PYTHONPATH=.
-                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/rest --junitxml=test-reports/results.xml || exit /b 1
+                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml || exit /b 1
                 '''
             }
         }
@@ -61,6 +58,20 @@ pipeline {
     post {
         always {
             node('agent-test') {
+                // Lanzar WireMock en segundo plano
+                bat '''
+                    start "" /B java -jar wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir wiremock
+                    timeout /t 3
+                '''
+
+                // Ejecutar tests de integración
+                bat '''
+                    mkdir test-reports
+                    set PYTHONPATH=.
+                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/rest --junitxml=test-reports/results.xml || exit /b 1
+                '''
+
+                // Publicar resultados
                 junit 'test-reports/results.xml'
             }
         }
