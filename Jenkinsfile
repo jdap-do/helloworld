@@ -5,8 +5,8 @@ pipeline {
         stage('Get Code') {
             agent { label 'agent-clone' }
             steps {
+                checkout scm
                 echo "FASE CLONADO=================================================================================================================="
-                echo "Clonando código"
                 git url: 'https://github.com/jdap-do/helloworld.git'
                 bat 'whoami'
                 bat 'hostname'
@@ -17,8 +17,8 @@ pipeline {
         stage('Build') {
             agent { label 'agent-build' }
             steps {
+                checkout scm
                 echo "FASE BUILD=================================================================================================================="
-                echo "Clonando código"
                 git url: 'https://github.com/jdap-do/helloworld.git'
                 echo "No hay compilación necesaria ya que es python"
                 bat 'whoami'
@@ -30,19 +30,23 @@ pipeline {
         stage('Test') {
             agent { label 'agent-test' }
             steps {
+                checkout scm
                 echo "FASE TEST=================================================================================================================="
-                echo "Clonando código"
                 git url: 'https://github.com/jdap-do/helloworld.git'
-                echo "Ejecutando pruebas REST con pytest"
                 bat 'whoami'
                 bat 'hostname'
                 bat 'echo %WORKSPACE%'
 
-                bat '''
-                    mkdir test-reports
-                    set PYTHONPATH=.
-                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/rest --junitxml=test-reports/results.xml || exit /b 1
-                '''
+                // Lanzamos Flask y WireMock
+                bat 'start "" /B python app/api.py'
+                bat 'start "" /B java -jar wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir wiremock'
+
+                // 👉 Solución: esperamos 5 segundos
+                bat 'timeout /t 5'
+
+                // Ejecutamos las pruebas
+                bat 'mkdir test-reports'
+                bat 'set PYTHONPATH=. && "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/rest --junitxml=test-reports/results.xml || exit /b 1'
             }
         }
     }
