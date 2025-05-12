@@ -1,26 +1,36 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('Get Code') {
+            agent any
             steps {
-                echo 'Clonando codigo'
-                //Obtener código desde mi repositorio, ya que hice un fork
+                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
-                bat 'dir'
-                bat 'echo %WORKSPACE%' 
+                bat 'whoami'
+                bat 'hostname'
+                bat 'echo %WORKSPACE%'
             }
         }
-        stage('Etapa Build') {
+
+        stage('Build') {
+            agent any
             steps {
-                echo 'NO HAY QUE COMPILAR NADA, ESTO ES PYTHON'
+                echo 'No hay compilación necesaria'
+                bat 'whoami'
+                bat 'hostname'
+                bat 'echo %WORKSPACE%'
             }
         }
 
         stage('Test') {
+            agent any
             steps {
-                echo 'Ejecutando pruebas unitarias con pytest'
+                echo 'Ejecutando pruebas con pytest'
                 bat '''
+                    whoami
+                    hostname
+                    echo %WORKSPACE%
                     mkdir test-reports
                     set PYTHONPATH=.
                     "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml || exit /b %errorlevel%
