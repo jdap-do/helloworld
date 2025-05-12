@@ -1,22 +1,28 @@
 pipeline {
-    agent any
-
+    agent none
+    
     stages {
         stage('Get Code') {
-            agent any
-            steps {
-                echo 'Clonando código'
-                git 'https://github.com/jdap-do/helloworld.git'
-                bat 'whoami'
-                bat 'hostname'
-                bat 'echo %WORKSPACE%'
+            agent { label 'master' }  // agente 1
+            stages {
+                stage('Checkout') {
+                    steps {
+                        echo 'FASE CLONADO============================================================================================='
+                        echo 'Clonando código'
+                        git 'https://github.com/jdap-do/helloworld.git'
+                        bat 'whoami'
+                        bat 'hostname'
+                        bat 'echo %WORKSPACE%'
+                    }
+                }
             }
         }
 
         stage('Build') {
-            agent any
+            agent { label 'master' }  // agente 2 (en este caso mismo host)
             steps {
-                echo 'No hay compilación necesaria'
+                echo 'FASE BUILD=================================================================================================================='
+                echo 'No hay compilación necesaria ya que es python'
                 bat 'whoami'
                 bat 'hostname'
                 bat 'echo %WORKSPACE%'
@@ -24,16 +30,17 @@ pipeline {
         }
 
         stage('Test') {
-            agent any
+            agent { label 'master' }  // agente 3 (simulado)
             steps {
+                echo 'FASE TEST=================================================================================================================='
                 echo 'Ejecutando pruebas con pytest'
+                bat 'whoami'
+                bat 'hostname'
+                bat 'echo %WORKSPACE%'
                 bat '''
-                    whoami
-                    hostname
-                    echo %WORKSPACE%
                     mkdir test-reports
                     set PYTHONPATH=.
-                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml || exit /b %errorlevel%
+                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml || exit /b 1
                 '''
             }
         }
@@ -41,7 +48,7 @@ pipeline {
 
     post {
         always {
-            junit allowEmptyResults: true, testResults: '**/test-reports/results.xml'
+            junit 'test-reports/results.xml'
         }
     }
 }
