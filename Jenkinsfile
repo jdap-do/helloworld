@@ -5,14 +5,11 @@ pipeline {
         stage('Get Code') {
             agent { label 'agent-clone' }
             steps {
-                echo 'FASE CLONADO=================================================================================================================='
-                echo 'Clonando código'
-                git 'https://github.com/jdap-do/helloworld.git'
-                echo 'whoami'
+                echo "FASE CLONADO=================================================================================================================="
+                echo "Clonando código"
+                git url: 'https://github.com/jdap-do/helloworld.git'
                 bat 'whoami'
-                echo 'hostname'
                 bat 'hostname'
-                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -20,15 +17,12 @@ pipeline {
         stage('Build') {
             agent { label 'agent-build' }
             steps {
-                echo 'FASE BUILD=================================================================================================================='
-                echo 'Clonando código'
-                git 'https://github.com/jdap-do/helloworld.git'
-                echo 'No hay compilación necesaria ya que es python'
-                echo 'whoami'
+                echo "FASE BUILD=================================================================================================================="
+                echo "Clonando código"
+                git url: 'https://github.com/jdap-do/helloworld.git'
+                echo "No hay compilación necesaria ya que es python"
                 bat 'whoami'
-                echo 'hostname'
                 bat 'hostname'
-                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -36,20 +30,18 @@ pipeline {
         stage('Test') {
             agent { label 'agent-test' }
             steps {
-                echo 'FASE TEST=================================================================================================================='
-                echo 'Clonando código'
-                git 'https://github.com/jdap-do/helloworld.git'
-                echo 'Ejecutando pruebas con pytest'
-                echo 'whoami'
+                echo "FASE TEST=================================================================================================================="
+                echo "Clonando código"
+                git url: 'https://github.com/jdap-do/helloworld.git'
+                echo "Ejecutando pruebas REST con pytest"
                 bat 'whoami'
-                echo 'hostname'
                 bat 'hostname'
-                echo 'echo %WORKSPACE%'
                 bat 'echo %WORKSPACE%'
+
                 bat '''
                     mkdir test-reports
                     set PYTHONPATH=.
-                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" --junitxml=test-reports/results.xml || exit /b 1
+                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/rest --junitxml=test-reports/results.xml || exit /b 1
                 '''
             }
         }
@@ -58,7 +50,7 @@ pipeline {
     post {
         always {
             node('agent-test') {
-                echo 'Ejecutando reporte de pruebas...'
+                echo "Ejecutando reporte de pruebas..."
                 junit 'test-reports/results.xml'
             }
         }
