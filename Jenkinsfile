@@ -60,8 +60,8 @@ pipeline {
             node('agent-test') {
                 echo 'Iniciando WireMock...'
                 bat '''
-                    start "" /B java -jar wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir wiremock
-                    timeout /t 3
+                    java -jar wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir wiremock > wiremock.log 2>&1 &
+                    timeout /t 5
                 '''
                 echo 'Ejecutando reporte de pruebas...'
                 junit 'test-reports/results.xml'
