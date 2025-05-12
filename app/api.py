@@ -46,3 +46,7 @@ def divide(op_1, op_2):
         return ("{}".format(CALCULATOR.divide(num_1, num_2)), http.client.OK, HEADERS)
     except TypeError as e:
         return (str(e), http.client.BAD_REQUEST, HEADERS)
+    
+
+if __name__ == "__main__":
+    api_application.run(host="0.0.0.0", port=5000)
