@@ -17,11 +17,14 @@ pipeline {
             }
         }
 
-         stage('Test') {
+        stage('Test') {
             steps {
                 echo 'Ejecutando pruebas unitarias con pytest'
-                bat 'mkdir test-reports'
-                bat '"C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml'
+                bat '''
+                    mkdir test-reports
+                    set PYTHONPATH=.
+                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml || exit /b %errorlevel%
+                '''
             }
         }
     }
