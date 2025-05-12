@@ -49,7 +49,7 @@ pipeline {
                 bat '''
                     mkdir test-reports
                     set PYTHONPATH=.
-                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/unit --junitxml=test-reports/results.xml || exit /b 1
+                    "C:\\Users\\joeda\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\pytest.exe" test/rest --junitxml=test-reports/results.xml || exit /b 1
                 '''
             }
         }
