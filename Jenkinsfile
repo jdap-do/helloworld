@@ -6,13 +6,9 @@ pipeline {
             agent { label 'agent-clone' }
             steps {
                 echo 'FASE CLONADO=================================================================================================================='
-                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
-                echo 'whoami'            
                 bat 'whoami'
-                echo 'hostname'
-                bat 'hostname'                
-                echo 'echo %WORKSPACE%'
+                bat 'hostname'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -21,14 +17,10 @@ pipeline {
             agent { label 'agent-build' }
             steps {
                 echo 'FASE BUILD=================================================================================================================='
-                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
-                echo 'No hay compilación necesaria ya que es python'
-                echo 'whoami'            
+                echo 'No hay compilación necesaria ya que es Python'
                 bat 'whoami'
-                echo 'hostname'
-                bat 'hostname'                
-                echo 'echo %WORKSPACE%'
+                bat 'hostname'
                 bat 'echo %WORKSPACE%'
             }
         }
@@ -37,14 +29,25 @@ pipeline {
             agent { label 'agent-test' }
             steps {
                 echo 'FASE TEST=================================================================================================================='
-                echo 'Clonando código'
                 git 'https://github.com/jdap-do/helloworld.git'
+                echo 'Levantando microservicio Flask y mock WireMock'
+
+                // Lanzar Flask app
+                bat '''
+                    start /B cmd /c "set FLASK_APP=app/main.py && set FLASK_RUN_PORT=5000 && flask run"
+                '''
+
+                // Lanzar WireMock
+                bat '''
+                    start /B cmd /c "java -jar wiremock-standalone-2.35.0.jar --port 9090"
+                '''
+
+                echo 'Esperando que servicios arranquen...'
+                bat 'timeout /t 5'
+
                 echo 'Ejecutando pruebas con pytest'
-                echo 'whoami'            
                 bat 'whoami'
-                echo 'hostname'
-                bat 'hostname'                
-                echo 'echo %WORKSPACE%'
+                bat 'hostname'
                 bat 'echo %WORKSPACE%'
                 bat '''
                     mkdir test-reports
